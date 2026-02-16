@@ -21,13 +21,11 @@ applyScanline:
     movl    %esp, %ebp                  
 
     # TODO
-    déréférencement p 
-    offset de 1 octet pour aller de r g b
-    skip de um octet pour le alpha
+
     movl 8(%ebp), %ebx # addr vers p
     movl 12(%ebp), %eax # pourcentage
     xorl %edx, %edx
-    movl $3, $ecx
+    movl $3, %ecx
     
     boucle:
     mull -1(%ebx, %ecx, 1), %eax

@@ -35,7 +35,14 @@ crtFilter:
     movl    %esp, %ebp                  
 
     # TODO
-   
+    boucle sur tous pixels (for y, for x)
+    boucle_y: # ligne
+
+    boucle_x: # colonne
+    Si la ligne y est un multiple de scanlineSpacing : call apply_scanline
+    paramètre subpixel est déterminé par la position horizontale du pixel : x % 3
+    call apply_phosphor
+
     # epilogue
     leave 
     ret 
