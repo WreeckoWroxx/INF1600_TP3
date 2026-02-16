@@ -8,12 +8,20 @@
 	make test : lance la suite de tests prévue pour vérifier le bon fonctionnement des fonctions et filtres implémentés.
 	make remise : crée un fichier zip contenant l’ensemble des fichiers nécessaires pour la remise du projet, prêt à être soumis.
 
+    Sources:
+    shrek.jpg: https://www.google.com/url?sa=t&source=web&rct=j&url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DHLQ1cK9Edhc&ved=0CBYQjRxqFwoTCOCi0sel3pIDFQAAAAAdAAAAABAK&opi=89978449
+    shrek2.jpg: https://www.google.com/url?sa=t&source=web&rct=j&url=https%3A%2F%2Fnews.sky.com%2Fstory%2Fdonkey-that-inspired-eddie-murphys-character-in-shrek-dies-aged-30-13283911&ved=0CBYQjRxqFwoTCMjFkPWc3pIDFQAAAAAdAAAAABAH&opi=89978449
+    shrek3.jpg: https://www.google.com/url?sa=t&source=web&rct=j&url=https%3A%2F%2Fwww.cornel1801.com%2Fanimated%2FShrek-2001%2Fpart-4-looking-for-the-princess-find-a-girl-dragon.html&ved=0CBYQjRxqFwoTCJiYj4qd3pIDFQAAAAAdAAAAABBY&opi=89978449
+
 */
 
 .data 
 
 inputCrt: 
-    .asciz "images/image.png"
+    .asciz "images/shrek.jpg"
+
+scanlineSpacing:
+    .int 10
 
 outputCrt:
     .asciz "crt.png"
@@ -34,7 +42,15 @@ main:
 
     # TODO: Charger l'image inputCrt en appelant loadImage()
 
+    pushl %esp
+    pushl $inputCrt
+    call loadImage
+        
+
     # TODO: Appliquer le filtre crtFilter() sur cette image
+    pushl 
+    pushl %esp
+    call crtFilter
 
     # TODO: Sauvegarder cette image dans le fichier outputCrt avec saveImage()
 
