@@ -46,9 +46,10 @@ main:
     pushl $inputCrt
     call loadImage
         
-
+    # push esp (addr vers image loadée) dans un registre pour sauvegarder référence vers l'image (?)
+    
     # TODO: Appliquer le filtre crtFilter() sur cette image
-    pushl 
+    pushl scanlineSpacing
     pushl %esp
     call crtFilter
 
