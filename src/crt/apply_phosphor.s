@@ -34,8 +34,60 @@ applyPhosphor:
     movl    %esp, %ebp                  
 
     # TODO
+    movl 12(%ebp), %ebx # subpixel
+
+    # verif composante rgb a garder
+    cmp $0, %ebx
+    jz rouge
+
+    cmp $1, %ebx
+    jz vert
+
+    bleu:
+    movl 8(%ebp), %eax
+    mull factor
+    xorl %edx, %edx
+    divl percent_conversion
+    movl %al, 8(%ebp)
+
+    movl 9(%ebp), %eax
+    mull factor
+    xorl %edx, %edx
+    divl percent_conversion
+    movl %al, 9(%ebp)
+
+    jmp epilogue
+
+    #rouge
+    movl 10(%ebp), %eax
+    mull factor
+    xorl %edx, %edx
+    divl percent_conversion
+    movl %al, 10(%ebp)
+
+    movl 9(%ebp), %eax
+    mull factor
+    xorl %edx, %edx
+    divl percent_conversion
+    movl %al, 9(%ebp)
+
+    jmp epilogue
+
+    #vert
+    movl 8(%ebp), %eax
+    mull factor
+    xorl %edx, %edx
+    divl percent_conversion
+    movl %al, 8(%ebp)
+
+    movl 10(%ebp), %eax
+    mull factor
+    xorl %edx, %edx
+    divl percent_conversion
+    movl %al, 10(%ebp)
 
     # epilogue
+    epilogue:
     leave 
     ret   
 
