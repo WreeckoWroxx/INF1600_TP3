@@ -21,18 +21,19 @@ applyScanline:
     movl    %esp, %ebp                  
 
     # TODO
-
-    movl 8(%ebp), %ebx # addr vers p
-    movl 12(%ebp), %eax # pourcentage
-    xorl %edx, %edx
+    movl 8(%ebp), %esi # addr vers p
+    movl 12(%ebp), %ebx # pourcentage
     movl $3, %ecx
     
-    boucle:
-    mull -1(%ebx, %ecx, 1), %eax
+    rgb_modif:
+    movl -1(%esi, %ecx, 1), %eax
+    mull %ebx
+
+    xorl %edx, %edx
     divl $percent_conversion
 
-    movl %eax, -1(%ebx, %ecx, 1)
-    loop boucle
+    movl %al, -1(%esi, %ecx, 1)
+    loop rgb_modif
 
     # epilogue
     leave 
