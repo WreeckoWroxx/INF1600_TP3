@@ -46,16 +46,26 @@ main:
     pushl $inputCrt
     call loadImage
         
-    # push esp (addr vers image loadée) dans un registre pour sauvegarder référence vers l'image (?)
-    
+    movl 4(%esp), %eax
     # TODO: Appliquer le filtre crtFilter() sur cette image
+    addl $8, %esp
     pushl scanlineSpacing
-    pushl %esp
+    pushl %eax
     call crtFilter
+    popl %eax
+    addl $4, %esp
 
     # TODO: Sauvegarder cette image dans le fichier outputCrt avec saveImage()
+    pushl %eax
+    pushl outputCrt
+    call saveImage
+    addl $4, %esp
+    popl %eax
 
     # TODO: Libérer la mémoire de vos images avec freeImage()
+#    pushl %eax
+#    call freeImage
+#    addl $4, %esp
 
     #################### Triangle de Sierpinski #######################
 

@@ -20,7 +20,12 @@ applyScanline:
     pushl   %ebp                      
     movl    %esp, %ebp                  
 
+    # Callee-saved push
+    pushl %esi
+    pushl %ebx
+    
     # TODO
+    
     movl 8(%ebp), %esi # addr vers p
     movl 12(%ebp), %ebx # pourcentage
     movl $3, %ecx
@@ -30,10 +35,14 @@ applyScanline:
     mull %ebx
 
     xorl %edx, %edx
-    divl $percent_conversion
+    divl percent_conversion
 
-    movl %al, -1(%esi, %ecx, 1)
+    movb %al, -1(%esi, %ecx, 1)
     loop rgb_modif
+
+    # Callee-saved pop
+    popl %ebx
+    popl %esi
 
     # epilogue
     leave 

@@ -32,17 +32,66 @@ max_index:
 crtFilter:
     # prologue
     pushl   %ebp                      
-    movl    %esp, %ebp                  
+    movl    %esp, %ebp       
+
+    movl 8(%ebp), %esi # addr de Image& dans esi
 
     # TODO
-    boucle sur tous pixels (for y, for x)
+    xorl %ecx, %ecx # compteur pour rangee
     boucle_y: # ligne
+    cmpl %ecx, 4(%esi)
+    jz fin 
 
+    movl 8(%esi, %ecx, 4), %ebx # MARCHE PAS
+
+    xorl %edx, %edx # compteur pour colonne
     boucle_x: # colonne
-    Si la ligne y est un multiple de scanlineSpacing : call apply_scanline
-    paramètre subpixel est déterminé par la position horizontale du pixel : x % 3
-    call apply_phosphor
+    cmpl %edx, (%esi)
+    jz prochain_y
 
+    movl (%ebx, %edx, 4), %edi # MARCHE PAS
+
+    pushl %edx # compteur de colonne
+
+    movl %edx, %eax
+    xorl %edx, %edx
+    divl 12(%ebp) # Division par scanlineSpacing
+    cmpw $0, %dx
+    popl %edx
+    jnz no_scanline
+
+    pushl %edx
+    pushl %ecx # sauvegarde de ecx   
+    pushl less_color # push des argumens
+    pushl %edi
+    call applyScanline
+    addl $8, %esp
+    popl %ecx
+    popl %edx
+
+    no_scanline:
+    movl %edx, %eax # move compteur de colonne (edx) dans eax pour division
+
+    xorl %edx, %edx
+    divl max_index
+    pushl %edx # caller-saved
+    pushl %ecx
+    pushl %edx # push des arguments
+    pushl %edi
+    call applyPhosphor
+    addl $8, %esp
+
+    popl %ecx 
+    popl %edx
+
+    incl %edx
+    jmp boucle_x
+
+    prochain_y:
+    incl %ecx
+    jmp boucle_y
+    
+    fin:
     # epilogue
     leave 
     ret 
