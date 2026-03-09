@@ -51,36 +51,37 @@ sierpinskiImage:
     cmpl $1, %eax
     jnz suite
 
+
     pushl %edi
 
-    #movl %edi, %edx
     addl $8, %edi
     movl (%edi), %edx
-
-    # movl (%edx), %edi
     addl %ecx, %edx
     movl (%edx), %edi
     addl %ebx, %edi
+
+    // movl %edi, %eax # TEST POUR VOIR VALEURS RGB DE PIXEL: Avant
+
     movl %esi, %edi
+    
+    // movl %edi, %eax # TEST POUR VOIR VALEURS RGB DE PIXEL: Apres
 
     popl %edi
 
-    jmp fin
-
-    // movl (%edi), %edx
-    # Vieu truc marche pas
+    # TEST POUR VOIR VALEURS RGB DE PIXEL
     // pushl %edi
-    // movl %edi, %edx
-    // addl $8, %edx # edx -> Pixel[0][]
-    // movl %edx, %edi
+
+    // #movl %edi, %edx
+    // addl $8, %edi
     // movl (%edi), %edx
-    // movl %edx, %edi
-    // addl %ecx, %edi
-    // movl (%edi), %edx  # edx -> Pixel[y][]
-    // addl %ebx, %edx  # edx -> Pixel[y][x]
-    // movl %esi, %edx
-    // popl %edi
-    // jmp fin
+
+    // # movl (%edx), %edi
+    // addl %ecx, %edx
+    // movl (%edx), %edi
+    // addl %ebx, %edi
+    // movl %edi, %eax
+
+    jmp fin
 
     suite:
     xorl %edx, %edx

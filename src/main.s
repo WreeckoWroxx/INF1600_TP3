@@ -29,6 +29,8 @@ outputCrt:
 outputSierpinski:
     .asciz "sierpinski.png"
 
+taille: .int 2
+
 
 .text 
 .globl main                      
@@ -72,8 +74,8 @@ main:
 
     # TODO: Créer une image vide de taille d'une puissance de 2 en appelant createImage()
     
-    pushl $1024
-    pushl $1024
+    pushl taille
+    pushl taille
     #subl $12, %esp
     pushl %esp
     call createImage
@@ -90,9 +92,9 @@ main:
     // pushb $0 # blue
     // pushb $255 # green
     // pushb $0 # red
-    pushl $0x00FF00FF
+    pushl $0xFF00FF00
     pushl %ecx
-    pushl $1024
+    pushl taille
     pushl $0
     pushl $0
     call sierpinskiImage
