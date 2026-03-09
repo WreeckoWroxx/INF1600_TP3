@@ -41,7 +41,7 @@ main:
     #################### Filtre CRT #######################
 
     # TODO: Charger l'image inputCrt en appelant loadImage()
-
+/*
     pushl %esp
     pushl $inputCrt
     call loadImage
@@ -66,21 +66,49 @@ main:
 #    pushl %eax
 #    call freeImage
 #    addl $4, %esp
-
+*/
     #################### Triangle de Sierpinski #######################
 
 
     # TODO: Créer une image vide de taille d'une puissance de 2 en appelant createImage()
-    # Puisque createImage() retourne une struct Image, il faut d’abord allouer de l’espace sur la pile pour l’image, puit push l’adresse de cet espace comme 3e paramètre avant de call la fonction.
+    
+    pushl $1024
+    pushl $1024
+    #subl $12, %esp
+    pushl %esp
+    call createImage
+    # Puisque createImage() retourne une struct Image, il faut d’abord allouer de l’espace sur la pile pour l’image, puis push l’adresse de cet espace comme 3e paramètre avant de call la fonction.
+    // addl $12, %esp
+    // pushl %eax
+    // subl $12, %esp
 
     # TODO: Dessiner le triangle de Sierpinski avec la fonction récursive sierpinskiImage()
+    leal (%eax), %ecx
+    pushl %ecx # garder dans la pile la reference vers img
+    # Push un pixel de couleur arbitraire
+    // pushb $255 # alpha
+    // pushb $0 # blue
+    // pushb $255 # green
+    // pushb $0 # red
+    pushl $0x00FF00FF
+    pushl %ecx
+    pushl $1024
+    pushl $0
+    pushl $0
+    call sierpinskiImage
+    addl $20, %esp
 
     # TODO: Sauvegarder cette image dans le fichier outputSierpinski avec saveImage()
+    popl %ecx
+    pushl %ecx
+    pushl $outputSierpinski
+    call saveImage
+    addl $4, %esp
 
     # TODO: Libérer la mémoire de vos images avec freeImage()
-
-
-
+    # Pas besoin de push Image& car %ecx est deja dans la pile
+    call freeImage
+    addl $4, %esp
 
     movl    $0, %eax
     # epilogue

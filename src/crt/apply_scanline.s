@@ -26,7 +26,8 @@ applyScanline:
     
     # TODO
     
-    movl 8(%ebp), %esi # addr vers p
+    movl 8(%ebp), %esi # addr vers pixel
+    #movl (%esi), %esi # dereferencer pixel
     movl 12(%ebp), %ebx # pourcentage
     movl $3, %ecx
     

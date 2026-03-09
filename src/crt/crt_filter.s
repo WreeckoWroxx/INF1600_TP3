@@ -34,62 +34,65 @@ crtFilter:
     pushl   %ebp                      
     movl    %esp, %ebp       
 
-    movl 8(%ebp), %esi # addr de Image& dans esi
-
     # TODO
-    xorl %ecx, %ecx # compteur pour rangee
-    boucle_y: # ligne
-    cmpl %ecx, 4(%esi)
-    jz fin 
+    movl 8(%ebp), %esi # addr de Image& dans esi
+    movl (%esi), %edx # largeur : nb de colonnes
+    movl 4(%esi), %ecx # hauteur : compteur pour rangee
+    movl 8(%esi), %ebx # pointeur vers tableau de tableaux de pixels: Pixel** Pixel[][] MARCHE PAS
+    #movl (%ebx), %ebx # dereferencer le pointeur vers le tableau de tableaux de pixels
 
-    movl 8(%esi, %ecx, 4), %ebx # MARCHE PAS
+    boucle_y: # rangee, utilise loop et ecx
+    movl -4(%ebx, %ecx, 4), %esi # pointeur vers tableau de pixels MARCHE PAS (overwrite esi: contient pointeur vers Pixel[] au lieu de Image&)
+    xorl %eax, %eax # compteur pour colonne
 
-    xorl %edx, %edx # compteur pour colonne
     boucle_x: # colonne
-    cmpl %edx, (%esi)
+    cmpl %eax, %edx
     jz prochain_y
+    movl (%esi, %eax, 4), %edi # pointeur vers un pixel MARCHE PAS
 
-    movl (%ebx, %edx, 4), %edi # MARCHE PAS
+    pushl %eax # sauver le compteur de colonne
+    pushl %edx # sauver le nb de colonnes
 
-    pushl %edx # compteur de colonne
-
-    movl %edx, %eax
+    # Verification pour applyScanline
     xorl %edx, %edx
-    divl 12(%ebp) # Division par scanlineSpacing
+    divl 12(%ebp) # Division du compteur de colonnes (eax) par scanlineSpacing
     cmpw $0, %dx
     popl %edx
+    popl %eax
     jnz no_scanline
 
-    pushl %edx
-    pushl %ecx # sauvegarde de ecx   
-    pushl less_color # push des argumens
+    pushl %edx # push caller-saved
+    pushl %ecx
+    pushl %eax
+    pushl less_color # push des arguments
     pushl %edi
     call applyScanline
-    addl $8, %esp
+    addl $8, %esp # ignorer les arguments dans la pile
+    popl %eax # pop caller-saved
     popl %ecx
     popl %edx
 
     no_scanline:
-    movl %edx, %eax # move compteur de colonne (edx) dans eax pour division
+    pushl %eax # sauver le compteur de colonne
+    pushl %edx # sauver le nb de colonnes
 
     xorl %edx, %edx
     divl max_index
-    pushl %edx # caller-saved
-    pushl %ecx
+
+    pushl %ecx # push caller-saved
     pushl %edx # push des arguments
     pushl %edi
     call applyPhosphor
-    addl $8, %esp
-
-    popl %ecx 
+    addl $8, %esp # ignorer les arguments dans la pile
+    popl %ecx # pop caller-saved
     popl %edx
+    popl %eax
 
-    incl %edx
+    incl %eax
     jmp boucle_x
 
     prochain_y:
-    incl %ecx
-    jmp boucle_y
+    loop boucle_y
     
     fin:
     # epilogue
