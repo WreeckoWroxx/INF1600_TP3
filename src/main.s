@@ -18,7 +18,9 @@
 .data 
 
 inputCrt: 
-    .asciz "images/shrek.jpg"
+    # TEST
+    .asciz "sierpinski.png"
+    #.asciz "images/shrek.jpg"
 
 scanlineSpacing:
     .int 10
@@ -29,7 +31,8 @@ outputCrt:
 outputSierpinski:
     .asciz "sierpinski.png"
 
-taille: .int 2
+taille:
+    .int 1024
 
 
 .text 
@@ -50,7 +53,7 @@ main:
         
     movl 4(%esp), %eax
     # TODO: Appliquer le filtre crtFilter() sur cette image
-    addl $8, %esp
+    #addl $8, %esp
     pushl scanlineSpacing
     pushl %eax
     call crtFilter
@@ -59,41 +62,60 @@ main:
 
     # TODO: Sauvegarder cette image dans le fichier outputCrt avec saveImage()
     pushl %eax
-    pushl outputCrt
+    pushl $outputCrt
     call saveImage
     addl $4, %esp
     popl %eax
 
     # TODO: Libérer la mémoire de vos images avec freeImage()
-#    pushl %eax
-#    call freeImage
-#    addl $4, %esp
+    pushl %eax
+    call freeImage
+    addl $4, %esp
 */
     #################### Triangle de Sierpinski #######################
 
 
     # TODO: Créer une image vide de taille d'une puissance de 2 en appelant createImage()
-    
+
+    subl $12, %esp
+    movl %esp, %eax
+    pushl %eax
     pushl taille
     pushl taille
-    #subl $12, %esp
-    pushl %esp
+    pushl %eax
     call createImage
     # Puisque createImage() retourne une struct Image, il faut d’abord allouer de l’espace sur la pile pour l’image, puis push l’adresse de cet espace comme 3e paramètre avant de call la fonction.
-    // addl $12, %esp
-    // pushl %eax
-    // subl $12, %esp
+    addl $12, %esp
 
     # TODO: Dessiner le triangle de Sierpinski avec la fonction récursive sierpinskiImage()
-    leal (%eax), %ecx
-    pushl %ecx # garder dans la pile la reference vers img
+    pushl %eax # garder dans la pile la reference vers img
+
+    # TEST COULEUR DE PIXEL
+/*
+    #movl 8(%eax), %eax # vérification que 8(%eax) = Pixel**
+    movl 8(%eax), %esi # acceder a Pixel**
+    #movl (%edi), %esi
+    movl 4(%esi), %eax # acceder au bon tableau Pixel*[]
+    leal 4(%eax), %esi # edi contient maintenant l'adresse du pixel a modifier
+    
+    // addl %ecx, %esi
+    // movl (%esi), %edi
+    // addl %ebx, %edi
+
+    movl (%esi), %eax # TEST POUR VOIR VALEURS RGB DE PIXEL: Avant
+
+    popl %eax
+    pushl %eax
+*/
+    # FIN TEST
+
     # Push un pixel de couleur arbitraire
     // pushb $255 # alpha
     // pushb $0 # blue
     // pushb $255 # green
     // pushb $0 # red
-    pushl $0xFF00FF00
-    pushl %ecx
+    pushl $0xFF0000FF # pixel rouge
+    pushl %eax
     pushl taille
     pushl $0
     pushl $0
@@ -101,18 +123,41 @@ main:
     addl $20, %esp
 
     # TODO: Sauvegarder cette image dans le fichier outputSierpinski avec saveImage()
-    popl %ecx
-    pushl %ecx
-    pushl $outputSierpinski
+    popl %eax
+    pushl %eax
+
+    # TEST COULEUR DE PIXEL
+/*
+    #movl 8(%eax), %eax # vérification que 8(%eax) = Pixel**
+    movl 8(%eax), %esi # acceder a Pixel**
+    #movl (%edi), %esi
+    movl 4(%esi), %eax # acceder au bon tableau Pixel*[]
+    leal 4(%eax), %esi # edi contient maintenant l'adresse du pixel a modifier
+    
+    // addl %ecx, %esi
+    // movl (%esi), %edi
+    // addl %ebx, %edi
+
+    movl (%esi), %eax # TEST POUR VOIR VALEURS RGB DE PIXEL: Avant
+
+    popl %eax
+*/
+    # FIN TEST
+
+    pushl %eax
+    pushl $outputSierpinski # argument
     call saveImage
-    addl $4, %esp
+    addl $8, %esp
 
     # TODO: Libérer la mémoire de vos images avec freeImage()
-    # Pas besoin de push Image& car %ecx est deja dans la pile
+    popl %eax
+    pushl %eax
     call freeImage
     addl $4, %esp
+    addl $4, %esp # enlever la reference vers l'image de la pile
+
 
     movl    $0, %eax
     # epilogue
     leave 
-    ret   
+    ret

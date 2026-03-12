@@ -37,97 +37,118 @@ sierpinskiImage:
     movl    %esp, %ebp                  
 
     # TODO
+    # Variables locales: 3
+    subl $12, %esp
+
     movl 8(%ebp), %ebx # x
     movl 12(%ebp), %ecx # y
     movl 16(%ebp), %eax # size
-    movl 20(%ebp), %edi # img
-    movl 24(%ebp), %esi # color
+    movl 20(%ebp), %edi # img aka Image&
+    movl 24(%ebp), %edx # color aka Pixel
 
-    Verification_borne:
+    # Verification des bornes
     cmpl (%edi), %ebx
     jge fin
+    cmpl 4(%edi), %ecx
+    jge fin
 
-    Pixel_drawing:
+    # Pixel drawing
     cmpl $1, %eax
     jnz suite
 
-
-    pushl %edi
-
-    addl $8, %edi
-    movl (%edi), %edx
-    addl %ecx, %edx
-    movl (%edx), %edi
-    addl %ebx, %edi
-
-    // movl %edi, %eax # TEST POUR VOIR VALEURS RGB DE PIXEL: Avant
-
-    movl %esi, %edi
-    
-    // movl %edi, %eax # TEST POUR VOIR VALEURS RGB DE PIXEL: Apres
-
-    popl %edi
-
-    # TEST POUR VOIR VALEURS RGB DE PIXEL
-    // pushl %edi
-
-    // #movl %edi, %edx
-    // addl $8, %edi
-    // movl (%edi), %edx
-
-    // # movl (%edx), %edi
-    // addl %ecx, %edx
-    // movl (%edx), %edi
-    // addl %ebx, %edi
-    // movl %edi, %eax
-
-    jmp fin
-
-    suite:
-    xorl %edx, %edx
-    divl halve # size -> half
-
-    #Lower left triangle
-    pushl %esi
-    pushl %edi
+    # Sauvegarder les valeurs des arguments
     pushl %eax
-    addl %eax, %ecx # y + half
-    pushl %ecx
-    pushl %ebx
-    call sierpinskiImage
-    addl $20, %esp
-
-    #Lower right triangle
-    pushl %esi
-    pushl %edi
-    pushl %eax
-    addl %eax, %ebx # x + half
-    pushl %ecx
-    pushl %ebx
-    call sierpinskiImage
-    addl $20, %esp
-
-
-    # top triangle
-    pushl %esi
-    pushl %edi
-    pushl %eax
-    subl %eax, %ecx # y + half -> y
-    pushl %ecx
-
-    pushl %eax
-    xorl %edx, %edx
-    movl $2, %eax
-    divl %ebx
-    movl %eax, %ebx
+    movl 8(%edi), %esi # acceder a Pixel**
+    movl (%esi, %ecx, 4), %eax # acceder au bon tableau Pixel*[]
+    leal (%eax, %ebx, 4), %esi # esi contient maintenant l'adresse du pixel a modifier
+    #movl (%esi), %eax # TEST POUR VOIR VALEURS RGB DE PIXEL: Avant
+    movl %edx, (%esi) # changer couleur
+    #movl (%edi), %eax # TEST POUR VOIR VALEURS RGB DE PIXEL: Apres
     popl %eax
 
+    # TEST POUR VOIR VALEURS RGB DE PIXEL
+/*
+    pushl %edi # Image&
+    pushl %eax
+
+    movl 8(%edi), %esi # acceder a Pixel**
+    movl (%esi, %ecx, 4), %eax # acceder au bon tableau Pixel*[]
+    leal (%eax, %ebx, 4), %esi # edi contient maintenant l'adresse du pixel a modifier
+
+    #movl %edx, (%esi) # changer couleur
+    
+    movl (%esi), %eax # TEST POUR VOIR VALEURS RGB DE PIXEL: Apres
+
+    popl %eax
+    popl %edi # remettre Image& dans edi
+*/
+    jmp fin
+
+
+
+    suite:
+    pushl %edx
+    xorl %edx, %edx
+    divl halve # size -> half
+    popl %edx
+
+
+    # LOWER LEFT TRIANGLE
+    pushl %edx
+    pushl %edi
+    pushl %eax
+    # var locale 1: y + half
+    pushl %ecx
+    addl %eax, %ecx
+    movl %ecx, -4(%ebp)
+    popl %ecx
+    # push var locale:
+    pushl -4(%ebp)
     pushl %ebx
     call sierpinskiImage
     addl $20, %esp
+
+
+    # LOWER RIGHT TRIANGLE
+    pushl %edx
+    pushl %edi
+    pushl %eax
+    pushl -4(%ebp)
+    # var locale 2: x + half
+    pushl %ebx
+    addl %eax, %ebx
+    movl %ebx, -8(%ebp)
+    popl %ebx
+    # push var locale:
+    pushl -8(%ebp)
+    call sierpinskiImage
+    addl $20, %esp
+
+
+    # TOP TRIANGLE
+    pushl %edx
+    pushl %edi
+    pushl %eax
+    pushl %ecx
+    # var locale 3: x + (half / 2)
+    pushl %eax
+    pushl %edx
+    pushl %ebx
+    xorl %edx, %edx
+    divl halve # half / 2
+    addl %eax, %ebx
+    movl %ebx, -12(%ebp) # x + (half / 2)
+    popl %ebx
+    popl %edx
+    popl %eax
+    # push var locale
+    pushl -12(%ebp)
+    call sierpinskiImage
+    addl $20, %esp
+
+
 
     fin:
     # epilogue
-    leave 
-    ret   
-
+    leave
+    ret

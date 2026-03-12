@@ -34,9 +34,11 @@ applyPhosphor:
     movl    %esp, %ebp                  
 
     # Callee-saved push
+    pushl %esi
     pushl %ebx
 
     # TODO
+    movl 8(%ebp), %esi # addr vers pixel
     movl 12(%ebp), %ebx # subpixel
 
     # verif composante rgb a garder
@@ -51,13 +53,13 @@ applyPhosphor:
     mull factor
     xorl %edx, %edx
     divl percent_conversion
-    movb %al, 8(%ebp)
+    movb %al, 8(%esi)
 
     movl 9(%ebp), %eax
     mull factor
     xorl %edx, %edx
     divl percent_conversion
-    movb %al, 9(%ebp)
+    movb %al, 9(%esi)
 
     jmp epilogue
 
@@ -66,13 +68,13 @@ applyPhosphor:
     mull factor
     xorl %edx, %edx
     divl percent_conversion
-    movb %al, 10(%ebp)
+    movb %al, 10(%esi)
 
     movl 9(%ebp), %eax
     mull factor
     xorl %edx, %edx
     divl percent_conversion
-    movb %al, 9(%ebp)
+    movb %al, 9(%esi)
 
     jmp epilogue
 
@@ -81,18 +83,19 @@ applyPhosphor:
     mull factor
     xorl %edx, %edx
     divl percent_conversion
-    movb %al, 8(%ebp)
+    movb %al, 8(%esi)
 
     movl 10(%ebp), %eax
     mull factor
     xorl %edx, %edx
     divl percent_conversion
-    movb %al, 10(%ebp)
+    movb %al, 10(%esi)
 
     # epilogue
     epilogue:
     # callee-saved pop
     popl %ebx
+    popl %esi
     
     leave 
     ret   

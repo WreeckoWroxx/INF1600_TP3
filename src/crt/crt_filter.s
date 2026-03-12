@@ -38,17 +38,31 @@ crtFilter:
     movl 8(%ebp), %esi # addr de Image& dans esi
     movl (%esi), %edx # largeur : nb de colonnes
     movl 4(%esi), %ecx # hauteur : compteur pour rangee
-    movl 8(%esi), %ebx # pointeur vers tableau de tableaux de pixels: Pixel** Pixel[][] MARCHE PAS
-    #movl (%ebx), %ebx # dereferencer le pointeur vers le tableau de tableaux de pixels
+    
+    # TENTATIVE DE RETROUVER UN PIXEL
+    movl 8(%esi), %edi # pointeur vers tableau de pointeurs de tableaux de pixels: Pixel** aka *(Pixel*[n][]) MARCHE PAS
+    // movl %edi, %ebx # dereferencer Pixel** : ebx contient tableau de pointeurs de pixels, soit Pixel*[0][]
+    // #movl %esi, %ebx # ebx contient maintenant l'adresse vers un tableau de pixels, soit Pixel*[0][]
+    // movl (%ebx, %eax, 4), %esi # passer au pixel suivant de la rangee; incrementer x du tableau de pixels: Pixel*[ecx][compteur pour colonne]
+    // movl (%esi), %ebx # dereferencer Pixel*[ecx][eax] : ebx contient maintenant un Pixel
 
     boucle_y: # rangee, utilise loop et ecx
-    movl -4(%ebx, %ecx, 4), %esi # pointeur vers tableau de pixels MARCHE PAS (overwrite esi: contient pointeur vers Pixel[] au lieu de Image&)
-    xorl %eax, %eax # compteur pour colonne
+    #pushl %ebx # sauvegarder Pixel*[0][]
+    #pushl %edi # sauvegarder Pixel** ?
 
-    boucle_x: # colonne
+    movl -4(%edi, %ecx, 4), %ebx # passer a la rangee de pixels suivantes; incrementer y du tableau de pointeurs de pixels: Pixel*[compteur pour rangee][] MARCHE PAS (overwrite esi: contient  Pixel[] au lieu de Image&)
+    #movl %esi, %ebx # NE PAS dereferencer Pixel*[ecx][] : ebx contient maintenant un tableau de pixels, soit Pixel[ecx][0]
+    xorl %eax, %eax # reset compteur pour colonne
+
+    boucle_x: # colonne, utilise edx comme max et eax comme compteur
     cmpl %eax, %edx
     jz prochain_y
-    movl (%esi, %eax, 4), %edi # pointeur vers un pixel MARCHE PAS
+    #movl (%esi, %eax, 4), %edi # pointeur vers un pixel MARCHE PAS
+    #movl $(%ebx), %esi # prendre l'addresse du pixel
+
+    # !!!
+    leal (%ebx, %eax, 4), %esi # passer au pixel suivant de la rangee; incrementer x du tableau de pixels: Pixel*[ecx][compteur pour colonne]
+    movl %esi, %ebx # NE PAS dereferencer Pixel*[ecx][eax] : ebx contient maintenant un Pixel
 
     pushl %eax # sauver le compteur de colonne
     pushl %edx # sauver le nb de colonnes
@@ -65,7 +79,7 @@ crtFilter:
     pushl %ecx
     pushl %eax
     pushl less_color # push des arguments
-    pushl %edi
+    pushl %ebx # push arg Pixel&
     call applyScanline
     addl $8, %esp # ignorer les arguments dans la pile
     popl %eax # pop caller-saved
@@ -81,7 +95,7 @@ crtFilter:
 
     pushl %ecx # push caller-saved
     pushl %edx # push des arguments
-    pushl %edi
+    pushl %ebx # push arg Pixel&
     call applyPhosphor
     addl $8, %esp # ignorer les arguments dans la pile
     popl %ecx # pop caller-saved
@@ -92,6 +106,8 @@ crtFilter:
     jmp boucle_x
 
     prochain_y:
+    #popl %edi # sauvegarder Pixel** ?
+    #popl %ebx # sauvegarder Pixel*[0][]
     loop boucle_y
     
     fin:
