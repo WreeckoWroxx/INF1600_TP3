@@ -38,58 +38,60 @@ applyPhosphor:
     pushl %ebx
 
     # TODO
-    movl 8(%ebp), %esi # addr vers pixel
+    movl 8(%ebp), %esi # addr du pixel
     movl 12(%ebp), %ebx # subpixel
+
+    xorl %eax, %eax
 
     # verif composante rgb a garder
     cmpl $0, %ebx
-    jz rouge
+    jz conserver_rouge
 
     cmpl $1, %ebx
-    jz vert
+    jz conserver_vert
 
-    bleu:
-    movl 8(%ebp), %eax
+    # conserver bleu:
+    movb (%esi), %al # couleur r du pixel dans al
     mull factor
     xorl %edx, %edx
     divl percent_conversion
-    movb %al, 8(%esi)
+    movb %al, (%esi)
 
-    movl 9(%ebp), %eax
+    movb 1(%esi), %al # couleur g du pixel dans al
     mull factor
     xorl %edx, %edx
     divl percent_conversion
-    movb %al, 9(%esi)
+    movb %al, 1(%esi)
 
     jmp epilogue
 
-    rouge:
-    movl 10(%ebp), %eax
+    conserver_rouge:
+    movb 1(%esi), %al # couleur g du pixel dans al
     mull factor
     xorl %edx, %edx
     divl percent_conversion
-    movb %al, 10(%esi)
+    movb %al, 1(%esi)
 
-    movl 9(%ebp), %eax
+    movb 2(%esi), %al # couleur b du pixel dans al
     mull factor
     xorl %edx, %edx
     divl percent_conversion
-    movb %al, 9(%esi)
+    movb %al, 2(%esi)
 
     jmp epilogue
 
-    vert:
-    movl 8(%ebp), %eax
+    conserver_vert:
+    movb (%esi), %al # couleur r du pixel dans al
     mull factor
     xorl %edx, %edx
     divl percent_conversion
-    movb %al, 8(%esi)
+    movb %al, (%esi)
 
-    movl 10(%ebp), %eax
+    movb 2(%esi), %al # couleur b du pixel dans al
     mull factor
     xorl %edx, %edx
     divl percent_conversion
-    movb %al, 10(%esi)
+    movb %al, 2(%esi)
 
     # epilogue
     epilogue:

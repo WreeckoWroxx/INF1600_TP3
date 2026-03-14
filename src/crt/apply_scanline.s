@@ -26,13 +26,15 @@ applyScanline:
     
     # TODO
     
-    movl 8(%ebp), %esi # addr vers pixel
+    movl 8(%ebp), %esi # addr du pixel
     #movl (%esi), %esi # dereferencer pixel
     movl 12(%ebp), %ebx # pourcentage
     movl $3, %ecx
+
+    xorl %eax, %eax
     
     rgb_modif:
-    movl -1(%esi, %ecx, 1), %eax
+    movb -1(%esi, %ecx, 1), %al
     mull %ebx
 
     xorl %edx, %edx

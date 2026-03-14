@@ -11,6 +11,7 @@ void sierpinskiImage(uint32_t x, uint32_t y, uint32_t size, Image& img, Pixel co
     }
 
     uint32_t half = size / 2;
+                size = size / 2
 
     // Triangle en bas à gauche
     sierpinskiImage(x, y + half, half, img, color);
@@ -38,7 +39,7 @@ sierpinskiImage:
 
     # TODO
     # Variables locales: 3
-    subl $12, %esp
+    #subl $12, %esp
 
     movl 8(%ebp), %ebx # x
     movl 12(%ebp), %ecx # y
@@ -58,12 +59,14 @@ sierpinskiImage:
 
     # Sauvegarder les valeurs des arguments
     pushl %eax
+    pushl %esi
     movl 8(%edi), %esi # acceder a Pixel**
     movl (%esi, %ecx, 4), %eax # acceder au bon tableau Pixel*[]
     leal (%eax, %ebx, 4), %esi # esi contient maintenant l'adresse du pixel a modifier
     #movl (%esi), %eax # TEST POUR VOIR VALEURS RGB DE PIXEL: Avant
     movl %edx, (%esi) # changer couleur
     #movl (%edi), %eax # TEST POUR VOIR VALEURS RGB DE PIXEL: Apres
+    popl %esi
     popl %eax
 
     # TEST POUR VOIR VALEURS RGB DE PIXEL
@@ -87,62 +90,84 @@ sierpinskiImage:
 
 
     suite:
+    pushl %eax
     pushl %edx
     xorl %edx, %edx
     divl halve # size -> half
+    movl %eax, %esi
     popl %edx
+    popl %eax
 
+    pushl %esi
+    pushl %ecx
+    pushl %ebx
 
     # LOWER LEFT TRIANGLE
     pushl %edx
     pushl %edi
-    pushl %eax
+    pushl %esi
     # var locale 1: y + half
+    #pushl %ecx
+    addl %esi, %ecx
     pushl %ecx
-    addl %eax, %ecx
-    movl %ecx, -4(%ebp)
-    popl %ecx
+    #movl %ecx, -4(%ebp)
+    #popl %ecx
     # push var locale:
-    pushl -4(%ebp)
+    #pushl -4(%ebp)
     pushl %ebx
     call sierpinskiImage
     addl $20, %esp
 
+
+    popl %ebx
+    popl %ecx
+    popl %esi
+    pushl %esi
+    pushl %ecx
+    pushl %ebx
 
     # LOWER RIGHT TRIANGLE
     pushl %edx
     pushl %edi
-    pushl %eax
-    pushl -4(%ebp)
+    pushl %esi
+    addl %esi, %ecx # y + half
+    pushl %ecx
     # var locale 2: x + half
+    #pushl %ebx
+    addl %esi, %ebx
     pushl %ebx
-    addl %eax, %ebx
-    movl %ebx, -8(%ebp)
-    popl %ebx
+    #movl %ebx, -8(%ebp)
+    #popl %ebx
     # push var locale:
-    pushl -8(%ebp)
+    #pushl -8(%ebp)
     call sierpinskiImage
     addl $20, %esp
 
 
+    popl %ebx
+    popl %ecx
+    popl %esi
+
     # TOP TRIANGLE
     pushl %edx
     pushl %edi
-    pushl %eax
-    pushl %ecx
+    pushl %esi
+    pushl %ecx # y
     # var locale 3: x + (half / 2)
     pushl %eax
     pushl %edx
-    pushl %ebx
+    #pushl %ebx
     xorl %edx, %edx
+    movl %esi, %eax
     divl halve # half / 2
     addl %eax, %ebx
-    movl %ebx, -12(%ebp) # x + (half / 2)
-    popl %ebx
+    #movl %ebx, -12(%ebp) # x + (half / 2)
+    #popl %ebx
     popl %edx
     popl %eax
     # push var locale
-    pushl -12(%ebp)
+    pushl %ebx
+    #pushl -12(%ebp)
     call sierpinskiImage
     addl $20, %esp
 

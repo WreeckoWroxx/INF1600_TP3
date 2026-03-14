@@ -40,11 +40,7 @@ crtFilter:
     movl 4(%esi), %ecx # hauteur : compteur pour rangee
     
     # TENTATIVE DE RETROUVER UN PIXEL
-    movl 8(%esi), %edi # pointeur vers tableau de pointeurs de tableaux de pixels: Pixel** aka *(Pixel*[n][]) MARCHE PAS
-    // movl %edi, %ebx # dereferencer Pixel** : ebx contient tableau de pointeurs de pixels, soit Pixel*[0][]
-    // #movl %esi, %ebx # ebx contient maintenant l'adresse vers un tableau de pixels, soit Pixel*[0][]
-    // movl (%ebx, %eax, 4), %esi # passer au pixel suivant de la rangee; incrementer x du tableau de pixels: Pixel*[ecx][compteur pour colonne]
-    // movl (%esi), %ebx # dereferencer Pixel*[ecx][eax] : ebx contient maintenant un Pixel
+    movl 8(%esi), %edi # Pixel** pointeur vers tableau de pointeurs de tableaux de pixels: Pixel** aka *(Pixel*[n][]) MARCHE PAS
 
     boucle_y: # rangee, utilise loop et ecx
     #pushl %ebx # sauvegarder Pixel*[0][]
@@ -62,7 +58,7 @@ crtFilter:
 
     # !!!
     leal (%ebx, %eax, 4), %esi # passer au pixel suivant de la rangee; incrementer x du tableau de pixels: Pixel*[ecx][compteur pour colonne]
-    movl %esi, %ebx # NE PAS dereferencer Pixel*[ecx][eax] : ebx contient maintenant un Pixel
+    #movl %esi, %ebx # NE PAS dereferencer Pixel*[ecx][eax] : ebx contient maintenant un Pixel
 
     pushl %eax # sauver le compteur de colonne
     pushl %edx # sauver le nb de colonnes
@@ -79,7 +75,7 @@ crtFilter:
     pushl %ecx
     pushl %eax
     pushl less_color # push des arguments
-    pushl %ebx # push arg Pixel&
+    pushl %esi # push arg Pixel&
     call applyScanline
     addl $8, %esp # ignorer les arguments dans la pile
     popl %eax # pop caller-saved
@@ -95,7 +91,7 @@ crtFilter:
 
     pushl %ecx # push caller-saved
     pushl %edx # push des arguments
-    pushl %ebx # push arg Pixel&
+    pushl %esi # push arg Pixel&
     call applyPhosphor
     addl $8, %esp # ignorer les arguments dans la pile
     popl %ecx # pop caller-saved

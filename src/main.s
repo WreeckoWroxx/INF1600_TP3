@@ -18,12 +18,10 @@
 .data 
 
 inputCrt: 
-    # TEST
-    .asciz "sierpinski.png"
-    #.asciz "images/shrek.jpg"
+    .asciz "images/zelda.png"
 
 scanlineSpacing:
-    .int 10
+    .int 2
 
 outputCrt:
     .asciz "crt.png"
@@ -46,37 +44,47 @@ main:
     #################### Filtre CRT #######################
 
     # TODO: Charger l'image inputCrt en appelant loadImage()
-/*
-    pushl %esp
+
+    subl $12, %esp
+    movl %esp, %eax
+    pushl %eax # caller-saved: référence vers Image
+    pushl %eax # push des arg
     pushl $inputCrt
     call loadImage
+    addl $8, %esp
+
+    popl %eax # reprendre la référence vers Image
         
-    movl 4(%esp), %eax
     # TODO: Appliquer le filtre crtFilter() sur cette image
-    #addl $8, %esp
-    pushl scanlineSpacing
+    pushl %eax # caller-saved
+    pushl scanlineSpacing # push des arg
     pushl %eax
     call crtFilter
-    popl %eax
-    addl $4, %esp
+    addl $8, %esp
+
+    popl %eax # reprendre la référence vers Image
 
     # TODO: Sauvegarder cette image dans le fichier outputCrt avec saveImage()
-    pushl %eax
+    pushl %eax # caller-saved
+    pushl %eax # push des arg
     pushl $outputCrt
     call saveImage
-    addl $4, %esp
+    addl $8, %esp
+
     popl %eax
 
     # TODO: Libérer la mémoire de vos images avec freeImage()
+    
     pushl %eax
     call freeImage
     addl $4, %esp
-*/
+    
+
     #################### Triangle de Sierpinski #######################
 
 
     # TODO: Créer une image vide de taille d'une puissance de 2 en appelant createImage()
-
+/*
     subl $12, %esp
     movl %esp, %eax
     pushl %eax
@@ -108,7 +116,7 @@ main:
     pushl %eax
 */
     # FIN TEST
-
+/*
     # Push un pixel de couleur arbitraire
     // pushb $255 # alpha
     // pushb $0 # blue
@@ -125,7 +133,7 @@ main:
     # TODO: Sauvegarder cette image dans le fichier outputSierpinski avec saveImage()
     popl %eax
     pushl %eax
-
+*/
     # TEST COULEUR DE PIXEL
 /*
     #movl 8(%eax), %eax # vérification que 8(%eax) = Pixel**
@@ -143,7 +151,7 @@ main:
     popl %eax
 */
     # FIN TEST
-
+/*
     pushl %eax
     pushl $outputSierpinski # argument
     call saveImage
@@ -155,7 +163,7 @@ main:
     call freeImage
     addl $4, %esp
     addl $4, %esp # enlever la reference vers l'image de la pile
-
+*/
 
     movl    $0, %eax
     # epilogue
