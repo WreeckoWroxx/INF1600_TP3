@@ -39,43 +39,36 @@ crtFilter:
     movl (%esi), %edx # largeur : nb de colonnes
     movl 4(%esi), %ecx # hauteur : compteur pour rangee
     
-    # TENTATIVE DE RETROUVER UN PIXEL
-    movl 8(%esi), %edi # Pixel** pointeur vers tableau de pointeurs de tableaux de pixels: Pixel** aka *(Pixel*[n][]) MARCHE PAS
+    movl 8(%esi), %edi # Pixel**
 
     boucle_y: # rangee, utilise loop et ecx
-    #pushl %ebx # sauvegarder Pixel*[0][]
-    #pushl %edi # sauvegarder Pixel** ?
-
-    movl -4(%edi, %ecx, 4), %ebx # passer a la rangee de pixels suivantes; incrementer y du tableau de pointeurs de pixels: Pixel*[compteur pour rangee][] MARCHE PAS (overwrite esi: contient  Pixel[] au lieu de Image&)
-    #movl %esi, %ebx # NE PAS dereferencer Pixel*[ecx][] : ebx contient maintenant un tableau de pixels, soit Pixel[ecx][0]
+    movl -4(%edi, %ecx, 4), %ebx # passer a la rangee de pixels suivantes
     xorl %eax, %eax # reset compteur pour colonne
 
     boucle_x: # colonne, utilise edx comme max et eax comme compteur
     cmpl %eax, %edx
     jz prochain_y
-    #movl (%esi, %eax, 4), %edi # pointeur vers un pixel MARCHE PAS
-    #movl $(%ebx), %esi # prendre l'addresse du pixel
+    
+    leal (%ebx, %eax, 4), %esi # mettre l'adresse du pixel suivant de la rangee dans esi
 
-    # !!!
-    leal (%ebx, %eax, 4), %esi # passer au pixel suivant de la rangee; incrementer x du tableau de pixels: Pixel*[ecx][compteur pour colonne]
-    #movl %esi, %ebx # NE PAS dereferencer Pixel*[ecx][eax] : ebx contient maintenant un Pixel
-
+    # Verification horizontale pour applyScanline
     pushl %eax # sauver le compteur de colonne
     pushl %edx # sauver le nb de colonnes
-
-    # Verification pour applyScanline
     xorl %edx, %edx
-    divl 12(%ebp) # Division du compteur de colonnes (eax) par scanlineSpacing
+    movl %ecx, %eax
+    subl $1, %eax # ecx va de max a 1, donc on soustrait 1 pour verifier les lignes max-1 a 0
+    divl 12(%ebp) # Division du compteur de rangee (ecx) par scanlineSpacing
     cmpw $0, %dx
     popl %edx
     popl %eax
     jnz no_scanline
 
+    # applyScanline
     pushl %edx # push caller-saved
     pushl %ecx
     pushl %eax
     pushl less_color # push des arguments
-    pushl %esi # push arg Pixel&
+    pushl %esi
     call applyScanline
     addl $8, %esp # ignorer les arguments dans la pile
     popl %eax # pop caller-saved
@@ -85,13 +78,12 @@ crtFilter:
     no_scanline:
     pushl %eax # sauver le compteur de colonne
     pushl %edx # sauver le nb de colonnes
-
     xorl %edx, %edx
     divl max_index
 
     pushl %ecx # push caller-saved
     pushl %edx # push des arguments
-    pushl %esi # push arg Pixel&
+    pushl %esi
     call applyPhosphor
     addl $8, %esp # ignorer les arguments dans la pile
     popl %ecx # pop caller-saved
@@ -102,11 +94,8 @@ crtFilter:
     jmp boucle_x
 
     prochain_y:
-    #popl %edi # sauvegarder Pixel** ?
-    #popl %ebx # sauvegarder Pixel*[0][]
     loop boucle_y
-    
-    fin:
+
     # epilogue
     leave 
     ret 

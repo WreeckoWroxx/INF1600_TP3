@@ -93,7 +93,6 @@ applyPhosphor:
     divl percent_conversion
     movb %al, 2(%esi)
 
-    # epilogue
     epilogue:
     # callee-saved pop
     popl %ebx

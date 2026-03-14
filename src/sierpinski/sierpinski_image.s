@@ -38,9 +38,6 @@ sierpinskiImage:
     movl    %esp, %ebp                  
 
     # TODO
-    # Variables locales: 3
-    #subl $12, %esp
-
     movl 8(%ebp), %ebx # x
     movl 12(%ebp), %ecx # y
     movl 16(%ebp), %eax # size
@@ -57,34 +54,16 @@ sierpinskiImage:
     cmpl $1, %eax
     jnz suite
 
-    # Sauvegarder les valeurs des arguments
-    pushl %eax
+    
+    pushl %eax # Sauvegarder les valeurs des arguments
     pushl %esi
     movl 8(%edi), %esi # acceder a Pixel**
     movl (%esi, %ecx, 4), %eax # acceder au bon tableau Pixel*[]
     leal (%eax, %ebx, 4), %esi # esi contient maintenant l'adresse du pixel a modifier
-    #movl (%esi), %eax # TEST POUR VOIR VALEURS RGB DE PIXEL: Avant
     movl %edx, (%esi) # changer couleur
-    #movl (%edi), %eax # TEST POUR VOIR VALEURS RGB DE PIXEL: Apres
     popl %esi
     popl %eax
 
-    # TEST POUR VOIR VALEURS RGB DE PIXEL
-/*
-    pushl %edi # Image&
-    pushl %eax
-
-    movl 8(%edi), %esi # acceder a Pixel**
-    movl (%esi, %ecx, 4), %eax # acceder au bon tableau Pixel*[]
-    leal (%eax, %ebx, 4), %esi # edi contient maintenant l'adresse du pixel a modifier
-
-    #movl %edx, (%esi) # changer couleur
-    
-    movl (%esi), %eax # TEST POUR VOIR VALEURS RGB DE PIXEL: Apres
-
-    popl %eax
-    popl %edi # remettre Image& dans edi
-*/
     jmp fin
 
 
@@ -94,7 +73,7 @@ sierpinskiImage:
     pushl %edx
     xorl %edx, %edx
     divl halve # size -> half
-    movl %eax, %esi
+    movl %eax, %esi # on met half dans esi
     popl %edx
     popl %eax
 
@@ -106,19 +85,13 @@ sierpinskiImage:
     pushl %edx
     pushl %edi
     pushl %esi
-    # var locale 1: y + half
-    #pushl %ecx
-    addl %esi, %ecx
+    addl %esi, %ecx # y + half
     pushl %ecx
-    #movl %ecx, -4(%ebp)
-    #popl %ecx
-    # push var locale:
-    #pushl -4(%ebp)
     pushl %ebx
     call sierpinskiImage
     addl $20, %esp
 
-
+    # Sauvegarde des paramètres
     popl %ebx
     popl %ecx
     popl %esi
@@ -132,14 +105,8 @@ sierpinskiImage:
     pushl %esi
     addl %esi, %ecx # y + half
     pushl %ecx
-    # var locale 2: x + half
-    #pushl %ebx
-    addl %esi, %ebx
+    addl %esi, %ebx # x + half
     pushl %ebx
-    #movl %ebx, -8(%ebp)
-    #popl %ebx
-    # push var locale:
-    #pushl -8(%ebp)
     call sierpinskiImage
     addl $20, %esp
 
@@ -153,21 +120,17 @@ sierpinskiImage:
     pushl %edi
     pushl %esi
     pushl %ecx # y
-    # var locale 3: x + (half / 2)
+    # x + (half / 2)
     pushl %eax
     pushl %edx
-    #pushl %ebx
     xorl %edx, %edx
     movl %esi, %eax
     divl halve # half / 2
-    addl %eax, %ebx
-    #movl %ebx, -12(%ebp) # x + (half / 2)
-    #popl %ebx
+    addl %eax, %ebx # x + (half / 2)
     popl %edx
     popl %eax
-    # push var locale
+    # push x + (half / 2)
     pushl %ebx
-    #pushl -12(%ebp)
     call sierpinskiImage
     addl $20, %esp
 
